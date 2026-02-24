@@ -21,7 +21,7 @@ CREATE TYPE proficiency_level_enum AS ENUM (
 -- =============================================================
 -- USERS: Create users table to store authentication information
 -- =============================================================
-CREATE TABLE users (
+CREATE TABLE Users (
   user_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   email varchar(255) UNIQUE NOT NULL,
   phone_number varchar(20) NOT NULL,
@@ -36,9 +36,9 @@ CREATE TABLE users (
 -- PROFILE: Create profiles table to store additional user details
 -- One-to-one relationship with users
 -- ===============================================================
-CREATE TABLE profiles (
+CREATE TABLE Profile (
   profile_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id uuid UNIQUE REFERENCES users(user_id) ON DELETE CASCADE,
+  user_id uuid UNIQUE REFERENCES Users(user_id) ON DELETE CASCADE,
   image_url text,
   first_name varchar(100) NOT NULL,
   last_name varchar(100) NOT NULL
@@ -47,7 +47,7 @@ CREATE TABLE profiles (
 -- =======================================
 -- ROLES: Defines roles each user can have
 -- =======================================
-CREATE TABLE roles (
+CREATE TABLE Role (
   role_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   role_type varchar(50) UNIQUE NOT NULL
 );
@@ -56,16 +56,16 @@ CREATE TABLE roles (
 -- USER_ROLES: Defines a one-to-many role for a single user
 -- ========================================================
 
-CREATE TABLE user_roles (
-  user_id uuid REFERENCES users(user_id) ON DELETE CASCADE,
-  role_id uuid REFERENCES roles(role_id) ON DELETE CASCADE,
+CREATE TABLE UserRole (
+  user_id uuid REFERENCES Users(user_id) ON DELETE CASCADE,
+  role_id uuid REFERENCES Role(role_id) ON DELETE CASCADE,
   PRIMARY KEY (user_id, role_id)
 );
 
 -- ====================================================================
 -- SOCIALS: Stores the different social platforms users/host belongs to
 -- ====================================================================
-CREATE TABLE socials (
+CREATE TABLE Social (
   social_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   social_platform varchar(50) UNIQUE NOT NULL
 );
@@ -75,9 +75,9 @@ CREATE TABLE socials (
 -- Defines a one-to-many relationship with socials table
 -- ============================================================================
 
-CREATE TABLE profile_socials (
-  profile_id uuid REFERENCES profiles(profile_id) ON DELETE CASCADE,
-  social_id uuid REFERENCES socials(social_id),
+CREATE TABLE ProfileSocial (
+  profile_id uuid REFERENCES Profile(profile_id) ON DELETE CASCADE,
+  social_id uuid REFERENCES Social(social_id),
   social_handle varchar(100) NOT NULL,
   url text,
   is_primary boolean DEFAULT false,
@@ -87,7 +87,7 @@ CREATE TABLE profile_socials (
 -- ========================================================
 -- LANGUAGE: Defines the different languages host can speak
 -- ========================================================
-CREATE TABLE languages (
+CREATE TABLE Language (
   language_id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
   language_name varchar(100) NOT NULL,
   iso_code varchar(10) UNIQUE
@@ -97,9 +97,9 @@ CREATE TABLE languages (
 -- HOST_LANGUAGE: Stores the different languages the host speaks
 -- Defines a one-to-many relationship with languages table
 -- =============================================================
-CREATE TABLE host_languages (
-  profile_id uuid REFERENCES profiles(profile_id) ON DELETE CASCADE,
-  language_id uuid REFERENCES languages(language_id),
+CREATE TABLE HostLanguage (
+  profile_id uuid REFERENCES Profile(profile_id) ON DELETE CASCADE,
+  language_id uuid REFERENCES Language(language_id),
   proficiency_level proficiency_level_enum NOT NULL,
   PRIMARY KEY (profile_id, language_id)
 );
