@@ -22,7 +22,7 @@ CREATE TABLE WishlistCategory (
 -- ============================================================
 CREATE TABLE Wishlist (
     wishlist_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES "User"(user_id),
+    user_id UUID NOT NULL REFERENCES Users(user_id),
     wishlist_category_id UUID REFERENCES WishlistCategory(wishlist_category_id),
     name VARCHAR(250) NOT NULL,
     description VARCHAR(500),
