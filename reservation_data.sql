@@ -66,7 +66,7 @@ CREATE TYPE refund_initiated_by_enum AS ENUM (
 -- CURRENCY
 -- Stores supported currencies and their symbols
 -- ============================================================
-CREATE TABLE currency (
+CREATE TABLE Currency (
     currency_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(15) NOT NULL,
     name VARCHAR(30) NOT NULL,
@@ -79,7 +79,7 @@ CREATE TABLE currency (
 -- BOOKING
 -- Represents a guest’s request for a listing
 -- ============================================================
-CREATE TABLE booking (
+CREATE TABLE Booking (
     booking_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     listing_id UUID NOT NULL REFERENCES Listing(listing_id),
     guest_id UUID NOT NULL REFERENCES Profile(profile_id),
@@ -98,7 +98,7 @@ CREATE TABLE booking (
 -- RESERVATION
 -- Represents confirmed stays based on a booking
 -- ============================================================
-CREATE TABLE reservation (
+CREATE TABLE Reservation (
     reservation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     listing_id UUID NOT NULL REFERENCES Listing(listing_id),
     guest_id UUID NOT NULL REFERENCES Profile(profile_id),
@@ -112,9 +112,9 @@ CREATE TABLE reservation (
 -- PAYMENT
 -- Records payments made by guests
 -- ============================================================
-CREATE TABLE payment (
+CREATE TABLE Payment (
     payment_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    booking_id UUID REFERENCES booking(booking_id),
+    booking_id UUID REFERENCES Booking(booking_id),
     guest_id UUID NOT NULL REFERENCES Profile(profile_id),
     amount DECIMAL(12,2) NOT NULL,
     currency_id UUID REFERENCES currency(currency_id),
@@ -129,7 +129,7 @@ CREATE TABLE payment (
 -- PAYOUT METHOD
 -- Methods for hosts to receive payouts
 -- ============================================================
-CREATE TABLE payout_method (
+CREATE TABLE PayoutMethod (
     payout_method_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name VARCHAR(50) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
@@ -141,10 +141,10 @@ CREATE TABLE payout_method (
 -- PAYOUT ACCOUNT
 -- Accounts associated with payout methods for hosts
 -- ============================================================
-CREATE TABLE payout_account (
+CREATE TABLE PayoutAccount (
     payout_account_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     host_id UUID NOT NULL REFERENCES Profile(profile_id),
-    payout_method_id UUID REFERENCES payout_method(payout_method_id),
+    payout_method_id UUID REFERENCES PayoutMethod(payout_method_id),
     account_name VARCHAR(200) NOT NULL,
     account_identifier VARCHAR(100) NOT NULL,
     currency_id UUID REFERENCES currency(currency_id),
@@ -157,11 +157,11 @@ CREATE TABLE payout_account (
 -- PAYOUT
 -- Records payouts made to hosts
 -- ============================================================
-CREATE TABLE payout (
+CREATE TABLE Payout (
     payout_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    reservation_id UUID REFERENCES reservation(reservation_id),
+    reservation_id UUID REFERENCES Reservation(reservation_id),
     host_id UUID NOT NULL REFERENCES Profile(profile_id),
-    payout_account_id UUID REFERENCES payout_account(payout_account_id),
+    payout_account_id UUID REFERENCES PayoutAccount(payout_account_id),
     amount DECIMAL(12,2) NOT NULL,
     currency_id UUID REFERENCES currency(currency_id),
     payout_status payout_status_enum DEFAULT 'pending',
@@ -172,7 +172,7 @@ CREATE TABLE payout (
 -- REFUND REASON
 -- Stores reasons for refunds along with default types and initiators
 -- ============================================================
-CREATE TABLE refund_reason (
+CREATE TABLE RefundReason (
     refund_reason_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code CHAR(20) NOT NULL,
     description TEXT,
@@ -186,15 +186,49 @@ CREATE TABLE refund_reason (
 -- REFUND
 -- Records refunds processed for payments or bookings
 -- ============================================================
-CREATE TABLE refund (
+CREATE TABLE Refund (
     refund_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    payment_id UUID REFERENCES payment(payment_id),
-    booking_id UUID REFERENCES booking(booking_id),
+    payment_id UUID REFERENCES Payment(payment_id),
+    booking_id UUID REFERENCES Booking(booking_id),
     amount DECIMAL(12,2) NOT NULL,
-    currency_id UUID REFERENCES currency(currency_id),
-    refund_reason_id UUID REFERENCES refund_reason(refund_reason_id),
+    currency_id UUID REFERENCES Currency(currency_id),
+    refund_reason_id UUID REFERENCES RefundReason(refund_reason_id),
     processed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     refund_type refund_type_enum
+);
+
+
+-- ============================================================
+-- BILLING ADDRESS RELATION
+-- Many-to-many relationship between Profile and Address.
+-- Allows a profile to have multiple addresses with roles.
+-- ============================================================
+CREATE TABLE BillingAddress (
+  address_id uuid REFERENCES Address(address_id),
+  profile_id uuid REFERENCES Profile(profile_id),
+  payment_id uuid REFERENCES Payment(payment_id),
+  address_role_id uuid REFERENCES AddressRole(address_role_id),
+  is_active boolean NOT NULL,
+  valid_from date NOT NULL,
+  valid_to date,
+  PRIMARY KEY (address_id, profile_id, payment_id, address_role_id)
+);
+
+
+-- ============================================================
+-- BUSINESS ADDRESS RELATION
+-- Many-to-many relationship between Profile and Address.
+-- Allows a profile to have multiple addresses with roles.
+-- ============================================================
+CREATE TABLE BusinessAddress (
+  address_id uuid REFERENCES Address(address_id),
+  profile_id uuid REFERENCES Profile(profile_id),
+  payment_id uuid REFERENCES Payment(payment_id),
+  address_role_id uuid REFERENCES AddressRole(address_role_id),
+  is_active boolean NOT NULL,
+  valid_from date NOT NULL,
+  valid_to date,
+  PRIMARY KEY (address_id, profile_id, payment_id, address_role_id)
 );
