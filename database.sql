@@ -7,3 +7,8 @@
 \i listing_data.sql
 \i reservation_data.sql
 \i wishlist_ratings.sql
+\i insert_user_data.sql
+\i insert_address_data.sql
+\i insert_listing_data.sql
+\i insert_reservation_data.sql
+\i insert_wishlist_ratings_data.sql
