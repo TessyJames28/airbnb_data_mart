@@ -122,16 +122,17 @@ INSERT INTO Address (
 )
 SELECT
     uuid_generate_v4(),
-    'Street ' || generate_series,
+    'Street ' || gs,
     c.city_id,
     'State',
-    '1000' || generate_series,
+    '1000' || gs,
     co.country_id,
-    'Building ' || generate_series,
-    generate_series::text
+    'Building ' || gs,
+    gs::text
 FROM City c
 JOIN Country co ON co.country_id = c.country_id
-LIMIT 25;
+-- Generate 25 rows
+JOIN generate_series(1, 25) AS gs ON TRUE;
 
 
 
@@ -153,25 +154,7 @@ SELECT
     ar.address_role_id,
     TRUE,
     CURRENT_DATE
-FROM Address a
-JOIN profiles p ON TRUE
-JOIN AddressRole ar ON ar.name = -- ============================================================
--- Every profile gets ONE Primary Residence
--- ============================================================
-INSERT INTO ProfileAddress (
-    address_id,
-    profile_id,
-    address_role_id,
-    is_active,
-    valid_from
-)
-SELECT
-    a.address_id,
-    p.profile_id,
-    ar.address_role_id,
-    TRUE,
-    CURRENT_DATE
-FROM profiles p
+FROM Profile p
 JOIN Address a ON TRUE
 JOIN AddressRole ar ON ar.name = 'Primary Residence'
 LIMIT 20;
