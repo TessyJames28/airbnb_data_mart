@@ -1,10 +1,4 @@
 -- ============================================================
--- ENABLE UUID GENERATION
--- Ensures we can generate UUIDs for primary keys if not already enabled
--- ============================================================
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
--- ============================================================
 -- ENUM TYPES
 -- Defines all enum types for booking, payment, payout, and refund status tracking
 -- ============================================================
@@ -51,6 +45,15 @@ CREATE TYPE payout_status_enum AS ENUM (
 CREATE TYPE refund_type_enum AS ENUM (
     'full',
     'partial'
+);
+
+-- ============================================================
+-- Refund status
+-- ============================================================
+CREATE TYPE refund_status_enum AS ENUM (
+    'pending',
+    'processed',
+    'failed'
 );
 
 -- ============================================================
@@ -174,7 +177,7 @@ CREATE TABLE Payout (
 -- ============================================================
 CREATE TABLE RefundReason (
     refund_reason_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    code CHAR(20) NOT NULL,
+    code CHAR(30) NOT NULL,
     description TEXT,
     default_refund_type refund_type_enum,
     initiated_by refund_initiated_by_enum,
@@ -196,7 +199,8 @@ CREATE TABLE Refund (
     processed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    refund_type refund_type_enum
+    refund_type refund_type_enum,
+    refund_status refund_status_enum
 );
 
 
@@ -222,13 +226,14 @@ CREATE TABLE BillingAddress (
 -- Many-to-many relationship between Profile and Address.
 -- Allows a profile to have multiple addresses with roles.
 -- ============================================================
+\echo 'Creating Table BusinessAddress'
 CREATE TABLE BusinessAddress (
   address_id uuid REFERENCES Address(address_id),
   profile_id uuid REFERENCES Profile(profile_id),
-  payment_id uuid REFERENCES Payment(payment_id),
+  payout_id uuid REFERENCES Payout(payout_id),
   address_role_id uuid REFERENCES AddressRole(address_role_id),
   is_active boolean NOT NULL,
   valid_from date NOT NULL,
   valid_to date,
-  PRIMARY KEY (address_id, profile_id, payment_id, address_role_id)
+  PRIMARY KEY (address_id, profile_id, payout_id, address_role_id)
 );
