@@ -62,9 +62,9 @@ SELECT
     'Wishlist ' || row_number() OVER (),
     'My saved listings',
     TRUE
-FROM users u
-JOIN user_roles ur ON ur.user_id = u.user_id
-JOIN roles r ON r.role_id = ur.role_id
+FROM Users u
+JOIN UserRole ur ON ur.user_id = u.user_id
+JOIN Role r ON r.role_id = ur.role_id
 JOIN WishlistCategory wc ON TRUE
 WHERE r.role_type = 'guest'
 LIMIT 20;
@@ -103,8 +103,7 @@ SELECT
     r.guest_id,
     3 + (random()*2)::int,
     'Great stay, very comfortable'
-FROM reservation r
-LIMIT 20;
+FROM reservation r;
 
 
 
@@ -120,8 +119,7 @@ SELECT
     ra.rating_id,
     res.listing_id
 FROM Rating ra
-JOIN reservation res ON res.reservation_id = ra.reservation_id
-LIMIT 20;
+JOIN reservation res ON res.reservation_id = ra.reservation_id;
 
 
 
@@ -138,8 +136,7 @@ SELECT
     l.host_id
 FROM Rating ra
 JOIN reservation res ON res.reservation_id = ra.reservation_id
-JOIN listing l ON l.listing_id = res.listing_id
-LIMIT 20;
+JOIN listing l ON l.listing_id = res.listing_id;
 
 
 
@@ -155,8 +152,7 @@ SELECT
     ra.rating_id,
     res.guest_id
 FROM Rating ra
-JOIN reservation res ON res.reservation_id = ra.reservation_id
-LIMIT 20;
+JOIN reservation res ON res.reservation_id = ra.reservation_id;
 
 
 
@@ -164,6 +160,7 @@ LIMIT 20;
 -- PROFILE RATING SUMMARY
 -- Aggregate ratings per profile
 -- ============================================================
+\echo 'Inserting into ProfileRatingSummary'
 INSERT INTO ProfileRatingSummary (
     profile_id,
     rating_count,
@@ -171,14 +168,26 @@ INSERT INTO ProfileRatingSummary (
     avg_rating
 )
 SELECT
-    host_profile_id,
-    COUNT(*),
-    SUM(r.rating_value),
-    AVG(r.rating_value)
+    rh.host_profile_id AS profile_id,
+    COUNT(*) AS rating_count,
+    SUM(r.rating_value) AS rating_sum,
+    AVG(r.rating_value) AS avg_rating
 FROM Rating r
-JOIN RatingHost rh ON rh.rating_id = r.rating_id
-GROUP BY host_profile_id
-LIMIT 20;
+LEFT JOIN RatingHost rh ON rh.rating_id = r.rating_id
+WHERE rh.host_profile_id IS NOT NULL
+GROUP BY rh.host_profile_id
+
+UNION ALL
+
+SELECT
+    gh.guest_profile_id AS profile_id,
+    COUNT(*) AS rating_count,
+    SUM(r.rating_value) AS rating_sum,
+    AVG(r.rating_value) AS avg_rating
+FROM Rating r
+LEFT JOIN RatingGuest gh ON gh.rating_id = r.rating_id
+WHERE gh.guest_profile_id IS NOT NULL
+GROUP BY gh.guest_profile_id;
 
 
 
@@ -186,6 +195,7 @@ LIMIT 20;
 -- LISTING RATING SUMMARY
 -- Aggregate ratings per listing
 -- ============================================================
+\echo 'Inserting into ListingRatingSummary'
 INSERT INTO ListingRatingSummary (
     listing_id,
     rating_count,
@@ -199,5 +209,4 @@ SELECT
     AVG(r.rating_value)
 FROM Rating r
 JOIN RatingListing rl ON rl.rating_id = r.rating_id
-GROUP BY rl.listing_id
-LIMIT 20;
+GROUP BY rl.listing_id;
