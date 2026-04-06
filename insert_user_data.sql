@@ -1,4 +1,4 @@
-i-- ======================================================
+-- ======================================================
 -- INSERT SAMPLE DATA FOR USERS, PROFILES, ROLES, SOCIALS
 -- ======================================================
 
@@ -45,10 +45,10 @@ FROM Users u;
 
 -- 4️⃣ USER_ROLES: Assign roles
 -- Assign guest role to all, host role to half
-INSERT INTO UserRoles (user_id, role_id)
+INSERT INTO UserRole (user_id, role_id)
 SELECT u.user_id, r.role_id
 FROM Users u
-JOIN Roles r ON r.role_type = 'guest';
+JOIN Role r ON r.role_type = 'guest';
 
 INSERT INTO UserRole (user_id, role_id)
 SELECT u.user_id, r.role_id
@@ -106,8 +106,8 @@ VALUES
 INSERT INTO HostLanguage (profile_id, language_id, proficiency_level)
 SELECT p.profile_id, l.language_id,
        CASE
-           WHEN l.language_name IN ('English','French','Spanish') THEN 'native'
-           WHEN l.language_name IN ('German','Italian','Portuguese') THEN 'fluent'
+           WHEN l.language_name IN ('English','French','Spanish') THEN 'native' ::proficiency_level_enum
+           WHEN l.language_name IN ('German','Italian','Portuguese') THEN 'fluent' ::proficiency_level_enum
            ELSE 'beginner'
        END
 FROM Profile p
