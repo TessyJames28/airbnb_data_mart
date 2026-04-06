@@ -207,27 +207,28 @@ WHERE p.profile_id IS NULL
    OR a.address_id IS NULL
    OR ar.address_role_id IS NULL;
 
--- Test 2: Ensure business addresses reference valid profile, payment, address, role
+-- Test 1: Ensure business addresses reference valid profile, payment, address, role
 SELECT ba.*
 FROM BusinessAddress ba
 LEFT JOIN Profile p ON p.profile_id = ba.profile_id
-LEFT JOIN Payment py ON py.payment_id = ba.payment_id
+LEFT JOIN Payout py ON py.payout_id = ba.payout_id
 LEFT JOIN Address a ON a.address_id = ba.address_id
 LEFT JOIN AddressRole ar ON ar.address_role_id = ba.address_role_id
 WHERE p.profile_id IS NULL
-   OR py.payment_id IS NULL
+   OR py.payout_id IS NULL
    OR a.address_id IS NULL
    OR ar.address_role_id IS NULL;
 
--- Test 3: Check duplicates in billing/business addresses
+-- Test 2: Check duplicates in billing addresses
 SELECT address_id, profile_id, payment_id, address_role_id, COUNT(*)
 FROM BillingAddress
 GROUP BY address_id, profile_id, payment_id, address_role_id
 HAVING COUNT(*) > 1;
 
-SELECT address_id, profile_id, payment_id, address_role_id, COUNT(*)
+-- Test 2: Check duplicates in business addresses
+SELECT address_id, profile_id, payout_id, address_role_id, COUNT(*)
 FROM BusinessAddress
-GROUP BY address_id, profile_id, payment_id, address_role_id
+GROUP BY address_id, profile_id, payout_id, address_role_id
 HAVING COUNT(*) > 1;
 
 
