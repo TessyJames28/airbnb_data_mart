@@ -53,7 +53,7 @@ CREATE TABLE Role (
 );
 
 -- ========================================================
--- USER_ROLES: Defines a one-to-many role for a single user
+-- USERROLE: Defines a one-to-many role for a single user
 -- ========================================================
 
 CREATE TABLE UserRole (
@@ -71,7 +71,7 @@ CREATE TABLE Social (
 );
 
 -- ============================================================================
--- PROFILE_SOCIALS: Stores a compilation of different social platforms for user
+-- PROFILESOCIAL: Stores a compilation of different social platforms for user
 -- Defines a one-to-many relationship with socials table
 -- ============================================================================
 
@@ -94,7 +94,7 @@ CREATE TABLE Language (
 );
 
 -- =============================================================
--- HOST_LANGUAGE: Stores the different languages the host speaks
+-- HOSTLANGUAGE: Stores the different languages the host speaks
 -- Defines a one-to-many relationship with languages table
 -- =============================================================
 CREATE TABLE HostLanguage (
