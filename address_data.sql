@@ -4,10 +4,6 @@
 -- Continent -> Country -> City -> Address
 -- ============================================================
 
--- ======================
--- Enable UUID generation
--- ======================
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ===========================================================
 -- Stores world continents
