@@ -3,10 +3,6 @@
 -- Stores user wishlists, categories, and items
 -- ============================================================
 
--- ======================
--- Enable UUID generation
--- ======================
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================================
 -- Wishlist categories (e.g., Favorites, Dream Trips)
