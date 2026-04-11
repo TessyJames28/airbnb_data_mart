@@ -4,10 +4,6 @@
 -- PropertyType -> Amenity -> ListLocation -> Listing etc
 -- ============================================================
 
--- ======================
--- Enable UUID generation
--- ======================
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- ============================================================
 -- PROPERTY TYPES
@@ -114,8 +110,8 @@ CREATE TABLE BedType (
 );
 
 -- ============================================================
--- BEDS
--- Beds inside each room, linked to bed types
+-- BED
+-- Bed inside each room, linked to bed types
 -- ============================================================
 CREATE TABLE Bed (
   bed_id uuid PRIMARY KEY,
